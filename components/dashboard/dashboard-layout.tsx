@@ -1,25 +1,31 @@
 "use client";
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { authClient } from '@/lib/auth-client';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { 
-  Menu, 
-  X, 
-  Search, 
-  User, 
-  LogOut, 
+import { useState, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { authClient } from "@/lib/auth-client";
+import Link from "next/link";
+import {
+  Menu,
+  X,
+  Search,
+  User,
+  LogOut,
   Settings,
   Bot,
   Video,
   Home,
-  Bell
-} from 'lucide-react';
+  Bell,
+} from "lucide-react";
+import { Spinner } from "@/components/ui/shadcn-io/spinner";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -27,26 +33,48 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleSignOut = async () => {
     await authClient.signOut();
-    router.push('/');
+    router.push("/");
   };
 
+  // 🔥 Trigger loading spinner whenever route changes
+  useEffect(() => {
+    setIsLoading(true);
+
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000); // adjust timing as needed
+
+    return () => clearTimeout(timer);
+  }, [pathname]);
+
   const navigationItems = [
-    { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'Agents', href: '/dashboard/agents', icon: Bot },
-    { name: 'Meets', href: '/dashboard/meets', icon: Video },
-    { name: 'Profile', href: '/dashboard/profile', icon: User },
+    { name: "Dashboard", href: "/dashboard", icon: Home },
+    { name: "Agents", href: "/agents", icon: Bot },
+    { name: "Meets", href: "/meets", icon: Video },
+    { name: "Profile", href: "/profile", icon: User },
   ];
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen w-screen bg-gray-50">
+        <Spinner className="w-12 h-12 text-blue-600" variant="infinite" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
-        isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
+      <div
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+      >
         <div className="flex items-center justify-between h-16 px-6 border-b">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
@@ -63,7 +91,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <X className="h-5 w-5" />
           </Button>
         </div>
-        
+
         <nav className="mt-6 px-3">
           <ul className="space-y-2">
             {navigationItems.map((item) => {
@@ -72,7 +100,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <li key={item.name}>
                   <Link
                     href={item.href}
-                    className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 hover:text-gray-900 transition-colors"
+                    className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${pathname === item.href
+                      ? "bg-gray-200 text-gray-900"
+                      : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                      }`}
                     onClick={() => setIsSidebarOpen(false)}
                   >
                     <Icon className="h-5 w-5 mr-3" />
@@ -123,7 +154,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               {/* User menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Button
+                    variant="ghost"
+                    className="relative h-8 w-8 rounded-full"
+                  >
                     <Avatar className="h-8 w-8">
                       <AvatarImage src="/placeholder-avatar.jpg" alt="User" />
                       <AvatarFallback>
@@ -132,7 +166,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuContent
+                  className="w-56"
+                  align="end"
+                  forceMount
+                >
                   <div className="flex items-center justify-start gap-2 p-2">
                     <div className="flex flex-col space-y-1 leading-none">
                       <p className="font-medium">John Doe</p>
@@ -160,9 +198,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-6">
-          {children}
-        </main>
+        <main className="flex-1 overflow-y-auto p-4 lg:p-6">{children}</main>
       </div>
 
       {/* Mobile sidebar overlay */}
