@@ -46,7 +46,7 @@ export default function SignInView() {
       if (result.error) {
         setError(result.error.message || 'Invalid credentials');
       } else {
-        router.push('/');
+        router.push('/dashboard');
         router.refresh();
       }
     } catch {
@@ -142,7 +142,7 @@ export default function SignInView() {
                   variant="outline"
                   className="flex-1 flex items-center justify-center gap-2"
                   onClick={() => {
-                    authClient.signIn.social({ provider: 'google' });
+                    authClient.signIn.social({ provider: 'google' , callbackURL: "/dashboard"});
                   }}
                 >
                   <span className="inline-flex items-center justify-center w-5 h-5">
@@ -160,7 +160,7 @@ export default function SignInView() {
                   variant="outline"
                   className="flex-1 flex items-center justify-center gap-2"
                   onClick={() => {
-                    authClient.signIn.social({ provider: 'github' });
+                    authClient.signIn.social({ provider: 'github' ,callbackURL: "/dashboard"});
                   }}
                 >
                   <span className="inline-flex items-center justify-center w-5 h-5">

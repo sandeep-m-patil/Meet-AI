@@ -48,7 +48,7 @@ export default function SignUpView() {
       if (result.error) {
         setError(result.error.message || 'Failed to create account');
       } else {
-        router.push('/');
+        router.push('/dashboard');
         router.refresh();
       }
     } catch {

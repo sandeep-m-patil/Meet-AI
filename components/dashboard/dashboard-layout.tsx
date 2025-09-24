@@ -53,6 +53,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     return () => clearTimeout(timer);
   }, [pathname]);
 
+  const {data:session} = authClient.useSession();
+
   const navigationItems = [
     { name: "Dashboard", href: "/dashboard", icon: Home },
     { name: "Agents", href: "/agents", icon: Bot },
@@ -145,11 +147,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
             {/* Right side items */}
             <div className="flex items-center space-x-4">
-              {/* Notifications */}
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"></span>
-              </Button>
+          
 
               {/* User menu */}
               <DropdownMenu>
@@ -173,9 +171,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 >
                   <div className="flex items-center justify-start gap-2 p-2">
                     <div className="flex flex-col space-y-1 leading-none">
-                      <p className="font-medium">John Doe</p>
+                      <p className="font-medium">{session?.user?.name}</p>
                       <p className="w-[200px] truncate text-sm text-muted-foreground">
-                        john.doe@example.com
+                        {session?.user?.email}
                       </p>
                     </div>
                   </div>
