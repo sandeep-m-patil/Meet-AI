@@ -3,6 +3,8 @@ import { useTRPC } from '@/trpc/client'
 import { useQuery } from '@tanstack/react-query';
 import LoadingState from '@/components/loading-state';
 import ErrorState from '@/components/error-state';
+import { Button } from '@/components/ui/button';
+import ResponsiveDialog from '@/components/dialog/responsive-dialog';
 export default function AgentsPage() {
   const trpc = useTRPC();
   const { data, isLoading, error } = useQuery(trpc.agents.getMany.queryOptions());
@@ -20,7 +22,11 @@ export default function AgentsPage() {
   return (
     <>
       <h1>
+
         {JSON.stringify(data, null, 2)} Agents Found
+        <ResponsiveDialog title="My Dialog" description="This is a responsive dialog" open={false} onOpenChange={() => { }}>
+          <Button>Open Dialog</Button>
+        </ResponsiveDialog>
       </h1></>
   );
 }
