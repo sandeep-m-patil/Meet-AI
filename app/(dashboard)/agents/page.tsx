@@ -1,32 +1,14 @@
-"use client"
-import { useTRPC } from '@/trpc/client'
-import { useQuery } from '@tanstack/react-query';
-import LoadingState from '@/components/loading-state';
-import ErrorState from '@/components/error-state';
-import { Button } from '@/components/ui/button';
-import ResponsiveDialog from '@/components/dialog/responsive-dialog';
-export default function AgentsPage() {
-  const trpc = useTRPC();
-  const { data, isLoading, error } = useQuery(trpc.agents.getMany.queryOptions());
-  console.log('Query data:', data);
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { AgentsList } from "@/components/agents/agents-list";
 
-  if (isLoading) {
-    return <LoadingState title='Loading Agents' description='Please wait while we load the agents' />
-  }
-  if (error) {
-    return <ErrorState title='Error Loading Agents' description={error.message} />
+export default async function AgentsPage() {
+  const session = await auth.api.getSession({ headers: await headers() });
+
+  if (!session) {
+    redirect("/sign-in");
   }
 
-
-
-  return (
-    <>
-      <h1>
-
-        {JSON.stringify(data, null, 2)} Agents Found
-        <ResponsiveDialog title="My Dialog" description="This is a responsive dialog" open={false} onOpenChange={() => { }}>
-          <Button>Open Dialog</Button>
-        </ResponsiveDialog>
-      </h1></>
-  );
+  return <AgentsList />;
 }

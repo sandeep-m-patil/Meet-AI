@@ -2,8 +2,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Bot, Video, Users, TrendingUp, Calendar, Clock, Plus, Play } from 'lucide-react';
+import { auth } from '@/lib/auth';
+import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const session = await auth.api.getSession({headers:await headers()});
+  if (!session) {
+    redirect("/sign-in");
+  }
   const stats = [
     { title: 'Active Agents', value: '3', icon: Bot, change: '+1 this week', color: 'text-blue-600' },
     { title: 'Meetings Today', value: '8', icon: Video, change: '+3 from yesterday', color: 'text-green-600' },
@@ -12,29 +19,29 @@ export default function DashboardPage() {
   ];
 
   const recentMeetings = [
-    { 
-      id: 1, 
-      title: 'Product Planning Meeting', 
-      time: '2:00 PM', 
-      participants: 5, 
+    {
+      id: 1,
+      title: 'Product Planning Meeting',
+      time: '2:00 PM',
+      participants: 5,
       status: 'Completed',
       duration: '1h 15m',
       agent: 'Meeting Assistant'
     },
-    { 
-      id: 2, 
-      title: 'Team Standup', 
-      time: '10:00 AM', 
-      participants: 8, 
+    {
+      id: 2,
+      title: 'Team Standup',
+      time: '10:00 AM',
+      participants: 8,
       status: 'Completed',
       duration: '28m',
       agent: 'Note Taker'
     },
-    { 
-      id: 3, 
-      title: 'Client Demo', 
-      time: '4:30 PM', 
-      participants: 3, 
+    {
+      id: 3,
+      title: 'Client Demo',
+      time: '4:30 PM',
+      participants: 3,
       status: 'In Progress',
       duration: '45m',
       agent: 'Action Tracker'
@@ -97,9 +104,8 @@ export default function DashboardPage() {
                 {recentMeetings.map((meeting) => (
                   <div key={meeting.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
                     <div className="flex items-center space-x-4">
-                      <div className={`w-3 h-3 rounded-full ${
-                        meeting.status === 'Completed' ? 'bg-green-500' : 'bg-blue-500'
-                      }`}></div>
+                      <div className={`w-3 h-3 rounded-full ${meeting.status === 'Completed' ? 'bg-green-500' : 'bg-blue-500'
+                        }`}></div>
                       <div>
                         <p className="font-medium">{meeting.title}</p>
                         <div className="flex items-center space-x-4 text-sm text-gray-500">
