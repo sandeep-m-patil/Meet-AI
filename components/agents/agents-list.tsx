@@ -9,6 +9,11 @@ import { PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { NewAgentDialog } from "@/components/agents/new-agent-dialog";
 import ResponsiveDialog from "@/components/dialog/responsive-dialog";
+import { DataTable } from "@/modules/agents/ui/components/data-table";
+import { columns } from "@/modules/agents/ui/components/columns";
+import { AgentGetOne } from "@/modules/agents/types";
+import EmptyState from "../empty-state";
+
 
 export const AgentsList = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -24,6 +29,7 @@ export const AgentsList = () => {
   }
 
   return (
+
     <>
       <NewAgentDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
       <div className="flex items-center justify-between mb-6">
@@ -34,13 +40,24 @@ export const AgentsList = () => {
         </Button>
       </div>
 
-      <pre>{JSON.stringify(data, null, 2)}</pre>
+      {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
+
+      <div className="flex-1 pb-4 md:px-8 flex flex-col gap-y-4">
+        <DataTable data={(data ?? []) as AgentGetOne[]} columns={columns} />
+        {data.length === 0 &&
+          <div className="h-[300px]">
+            <EmptyState title="Create your first agent" 
+            description="Create a new agent to join your meetings. 
+            Each agent will follow your instructions and can interact with participants during the call." />
+          </div>
+        }
+      </div>
 
       <ResponsiveDialog
         title="My Dialog"
         description="This is a responsive dialog"
         open={false}
-        onOpenChange={() => {}}
+        onOpenChange={() => { }}
       >
         <Button>Open Dialog</Button>
       </ResponsiveDialog>
