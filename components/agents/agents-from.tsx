@@ -41,10 +41,10 @@ export const AgentForm = ({ onSuccess, onCancel, initialValues }: AgentFormProps
 
     const isEdit = !!initialValues?.id;
     const queryClient = new QueryClient();
-    const createAgentMutation = useMutation(
+    const createAgent = useMutation(
         trpc.agents.create.mutationOptions({
             onSuccess: async () => {
-                await queryClient.invalidateQueries(trpc.agents.getMany.queryOptions());
+                await queryClient.invalidateQueries(trpc.agents.getMany.queryOptions({}));
 
                 if (initialValues) {
                     await queryClient.invalidateQueries(
@@ -60,14 +60,14 @@ export const AgentForm = ({ onSuccess, onCancel, initialValues }: AgentFormProps
         })
     );
 
-    const isPending = createAgentMutation.isPending;
+    const isPending = createAgent.isPending;
 
     const onSubmit = (values: z.infer<typeof agentsInsertSchema>) => {
         if (isEdit) {
             console.log("Edit mode - submission not implemented yet");
         } else {
             console.log("Create mode - submitting", values);
-            createAgentMutation.mutate(values);
+            createAgent.mutate(values);
         }
     };
 

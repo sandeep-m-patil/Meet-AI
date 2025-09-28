@@ -1,41 +1,55 @@
-"use client"
+"use client";
 
-import { ColumnDef } from "@tanstack/react-table"
-import { AgentGetOne } from "../../types"
-import { GeneratedAvatar } from "@/components/avatar/generated-avatar"
-import { CornerDownRightIcon, VideoIcon } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
+import { ColumnDef } from "@tanstack/react-table";
+import { AgentGetOne } from "../../types";
+import { GeneratedAvatar } from "@/components/avatar/generated-avatar";
+import { CornerDownRightIcon, VideoIcon } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils"; // Optional utility to conditionally join classNames
 
 export const columns: ColumnDef<AgentGetOne>[] = [
   {
     accessorKey: "name",
-    header: "Agent Name",
-    cell: ({ row }) => (
-      <div className="flex flex-col gap-y-1">
-        <div className="flex items-center gap-x-2">
-          <GeneratedAvatar
-            variant="botttsNeutral"
-            seed={row.original.name}
-            className="size-6"
-          />
-          <span className="font-semibold capitalize">{row.original.name}</span>
+    header: () => <div className="text-left">Agent</div>,
+    cell: ({ row }) => {
+      const { name, instructions } = row.original;
+      return (
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-3">
+            <GeneratedAvatar
+              variant="botttsNeutral"
+              seed={name}
+              className="h-8 w-8 rounded-full border"
+            />
+            <span className="font-medium text-sm capitalize">{name}</span>
+          </div>
+          <div className="flex items-center text-muted-foreground text-xs gap-2 pl-11">
+            <CornerDownRightIcon className="h-3 w-3 shrink-0" />
+            <span className="truncate max-w-[250px] capitalize">
+              {instructions || "No instructions"}
+            </span>
+          </div>
         </div>
-        <div className="flex items-center gap-x-2 ">
-          <CornerDownRightIcon className="size-3 text-muted-foreground" />
-          <span className="text-muted-foreground max-w-[200px] text-sm truncate capitalize">{row.original.instructions}</span>
-        </div>
-      </div>
-    )
+      );
+    },
   },
   {
     accessorKey: "meetingCount",
-    header: "Meetings",
-    cell: () => (
-      <Badge variant="outline"
-        className="py-2 flex items-center gap-x-2 [&>svg]:size-4">
-        <VideoIcon className="text-blue-700" />
-        5 Meetings
-      </Badge>
-    )
-  }
-]
+    header: () => <div className="text-left">Meetings</div>,
+    cell: ({ row }) => {
+      const count = row.original.meetingCount ?? 0;
+
+      return (
+        <Badge
+          variant="outline"
+          className="p-2"
+        >
+          <VideoIcon className="h-4 w-4 text-blue-600" />
+          <span>
+            {count} {count === 1 ? "Meeting" : "Meetings"}
+          </span>
+        </Badge>
+      );
+    },
+  },
+];

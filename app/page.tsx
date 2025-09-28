@@ -38,14 +38,7 @@ export default function HomePage() {
     }
   ];
 
-  const integrations = [
-    { name: "Google Meet", logo: "🔗" },
-    { name: "Zoom", logo: "🔗" },
-    { name: "Microsoft Teams", logo: "🔗" },
-    { name: "Slack", logo: "🔗" },
-    { name: "Discord", logo: "🔗" },
-    { name: "Calendar", logo: "📅" }
-  ];
+ 
 
   const testimonials = [
     {
@@ -171,26 +164,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Integrations Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Works with your favorite tools
-          </h2>
-          <p className="text-xl text-gray-600 mb-12">
-            Seamlessly integrate with the platforms your team already uses.
-          </p>
-          
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
-            {integrations.map((integration, index) => (
-              <div key={index} className="flex flex-col items-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                <div className="text-2xl mb-2">{integration.logo}</div>
-                <span className="text-sm font-medium text-gray-700">{integration.name}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Testimonials Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
@@ -244,7 +217,7 @@ export default function HomePage() {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-blue-600">
+            <Button size="lg" variant="outline" className="w-full sm:w-auto border-white text-black hover:bg-white hover:text-blue-600">
               Contact Sales
             </Button>
           </div>

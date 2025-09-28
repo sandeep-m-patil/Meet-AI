@@ -59,7 +59,7 @@ export default function SignUpView() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50">
+    <div className="flex justify-center items-center min-h-screen ">
       <Card className="flex flex-row w-full max-w-4xl overflow-hidden shadow-lg">
         {/* Left Column - Form */}
         <div className="flex-1 p-8 md:p-12">
