@@ -4,6 +4,7 @@ import { meetings } from "@/db/schema";
 import { and, eq, desc, getTableColumns, count } from "drizzle-orm";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+import { meetingsInsertSchema } from "../schemas";
 
 export const meetingsRouter = createTRPCRouter({
   // Get one meeting by ID
@@ -74,4 +75,26 @@ export const meetingsRouter = createTRPCRouter({
         },
       };
     }),
+
+
+    // Create a new meetings
+      create: protectedProcedure
+        .input(meetingsInsertSchema)
+        .mutation(async ({ input, ctx }) => {
+          const userId = ctx.auth.user.id;
+    
+          const [createdMeeting] = await db
+            .insert(meetings)
+            .values({
+              ...input,
+              userId,
+            })
+            .returning();
+    // TODO create stream call , upsert stream users
+
+
+
+
+          return createdMeeting;
+        }),
 });

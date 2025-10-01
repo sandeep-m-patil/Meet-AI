@@ -7,6 +7,7 @@ import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorState from "@/components/error-state";
+import { MeetingsListHeader } from "@/modules/meetings/ui/components/meetings-list-header";
 
 export default async function Page() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -21,12 +22,17 @@ export default async function Page() {
   await queryClient.prefetchQuery(trpc.meetings.getMany.queryOptions({}));
 
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
+    <>
+    <MeetingsListHeader/>
+      <HydrationBoundary state={dehydrate(queryClient)}>
       <Suspense>
         <ErrorBoundary fallback={<ErrorState title="Something went wrong" description="Error Loading Meetings" />}>
           <MeetingsView />
         </ErrorBoundary>
       </Suspense>
     </HydrationBoundary>
+    
+    </>
+  
   );
 }
