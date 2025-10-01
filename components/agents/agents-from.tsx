@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { GeneratedAvatar } from "../avatar/generated-avatar";
 import { QueryClient, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -41,17 +42,12 @@ export const AgentForm = ({ onSuccess, onCancel, initialValues }: AgentFormProps
 
     const isEdit = !!initialValues?.id;
     const queryClient = new QueryClient();
+    
     const createAgent = useMutation(
         trpc.agents.create.mutationOptions({
             onSuccess: async () => {
                 await queryClient.invalidateQueries(trpc.agents.getMany.queryOptions({}));
-
-                if (initialValues) {
-                    await queryClient.invalidateQueries(
-                        trpc.agents.getOne.queryOptions({ id: initialValues.id })
-                    );
-                }
-
+                toast.success("Agent created successfully");
                 onSuccess?.();
             },
             onError: (error) => {
@@ -60,13 +56,35 @@ export const AgentForm = ({ onSuccess, onCancel, initialValues }: AgentFormProps
         })
     );
 
-    const isPending = createAgent.isPending;
+    const updateAgent = useMutation(
+        trpc.agents.update.mutationOptions({
+            onSuccess: async () => {
+                await queryClient.invalidateQueries(trpc.agents.getMany.queryOptions({}));
+                
+                if (initialValues?.id) {
+                    await queryClient.invalidateQueries(
+                        trpc.agents.getOne.queryOptions({ id: initialValues.id })
+                    );
+                }
+                
+                toast.success("Agent updated successfully");
+                onSuccess?.();
+            },
+            onError: (error) => {
+                toast.error(error.message);
+            },
+        })
+    );
+
+    const isPending = createAgent.isPending || updateAgent.isPending;
 
     const onSubmit = (values: z.infer<typeof agentsInsertSchema>) => {
-        if (isEdit) {
-            console.log("Edit mode - submission not implemented yet");
+        if (isEdit && initialValues?.id) {
+            updateAgent.mutate({
+                id: initialValues.id,
+                data: values,
+            });
         } else {
-            console.log("Create mode - submitting", values);
             createAgent.mutate(values);
         }
     };
@@ -96,6 +114,7 @@ export const AgentForm = ({ onSuccess, onCancel, initialValues }: AgentFormProps
                     />
                 </div>
 
+              
                 <FormField
                     control={form.control}
                     name="instructions"
@@ -109,7 +128,6 @@ export const AgentForm = ({ onSuccess, onCancel, initialValues }: AgentFormProps
                         </FormItem>
                     )}
                 />
-
                 <div className="flex justify-end gap-2">
                     {onCancel && (
                         <Button type="button" variant="outline" onClick={onCancel}>

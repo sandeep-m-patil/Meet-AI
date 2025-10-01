@@ -20,16 +20,7 @@ import {
 } from 'lucide-react';
 
 export default function ProfilePage() {
-  const user = {
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    avatar: '/placeholder-avatar.jpg',
-    joinDate: 'January 2024',
-    plan: 'Pro',
-    meetings: 156,
-    agents: 3,
-    recordings: 89
-  };
+
 
   const notifications = [
     { id: 1, title: 'Meeting Reminder', description: 'Product Planning Meeting starts in 15 minutes', time: '2 minutes ago', read: false },

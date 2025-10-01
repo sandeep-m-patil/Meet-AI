@@ -5,7 +5,7 @@ import { AgentGetOne } from "../../types";
 import { GeneratedAvatar } from "@/components/avatar/generated-avatar";
 import { CornerDownRightIcon, VideoIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils"; // Optional utility to conditionally join classNames
+
 
 export const columns: ColumnDef<AgentGetOne>[] = [
   {
@@ -52,4 +52,5 @@ export const columns: ColumnDef<AgentGetOne>[] = [
       );
     },
   },
+  
 ];
