@@ -12,7 +12,10 @@ export const columns: ColumnDef<AgentGetOne>[] = [
     accessorKey: "name",
     header: () => <div className="text-left">Agent</div>,
     cell: ({ row }) => {
-      const { name, instructions } = row.original;
+      const agent = row.original;
+      if (!agent) return null;
+      
+      const { name, instructions } = agent;
       return (
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-3">
@@ -37,7 +40,10 @@ export const columns: ColumnDef<AgentGetOne>[] = [
     accessorKey: "meetingCount",
     header: () => <div className="text-left">Meetings</div>,
     cell: ({ row }) => {
-      const count = row.original.meetingCount ?? 0;
+      const agent = row.original;
+      if (!agent) return null;
+      
+      const count = agent.meetingCount ?? 0;
 
       return (
         <Badge
