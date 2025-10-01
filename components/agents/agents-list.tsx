@@ -18,7 +18,7 @@ import { useRouter } from "next/navigation";
 export const AgentsList = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  // 🔹 Filters
+  // Filters
   const [filters, setFilters] = useState<{
     search: string | null;
     isActive: boolean | null;
@@ -32,10 +32,10 @@ export const AgentsList = () => {
   const router = useRouter();
   const trpc = useTRPC();
 
-  // 🔹 Pagination state (0-based for TanStack)
+  // Pagination state (0-based for TanStack)
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 
-  // 🔹 Query: send filters + pagination
+  // Query: send filters + pagination
   const { data, isLoading, error } = useSuspenseQuery(
     trpc.agents.getMany.queryOptions({
       page: pagination.pageIndex + 1, // backend expects 1-based

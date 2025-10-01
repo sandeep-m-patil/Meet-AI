@@ -6,9 +6,7 @@ import {
   Video, 
   Users, 
   Zap, 
-  Shield, 
   ArrowRight, 
-  CheckCircle,
   Star,
   Play
 } from 'lucide-react';

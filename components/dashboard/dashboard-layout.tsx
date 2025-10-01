@@ -58,7 +58,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const navigationItems = [
     { name: "Dashboard", href: "/dashboard", icon: Home },
     { name: "Agents", href: "/agents", icon: Bot },
-    { name: "Meets", href: "/meets", icon: Video },
+    { name: "Meetings", href: "/meetings", icon: Video },
       { name: "Upgrade", href: "/upgrade", icon: Bell },
     { name: "Profile", href: "/profile", icon: User },
   ];

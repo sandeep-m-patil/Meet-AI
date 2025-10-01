@@ -19,11 +19,8 @@ import {
   TrashIcon,
   CalendarIcon,
   ClockIcon,
-  TagIcon,
-  ActivityIcon,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import { agentsInsertSchema } from "@/modules/agents/schemas";
 
 interface AgentDetailsProps {
   agentId: string;
