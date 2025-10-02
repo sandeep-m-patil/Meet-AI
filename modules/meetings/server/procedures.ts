@@ -92,9 +92,90 @@ export const meetingsRouter = createTRPCRouter({
             .returning();
     // TODO create stream call , upsert stream users
 
-
-
-
           return createdMeeting;
         }),
+
+    // Update an existing meeting
+    update: protectedProcedure
+      .input(
+        z.object({
+          id: z.string(),
+          data: meetingsInsertSchema,
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        const userId = ctx.auth.user.id;
+
+        // First verify the meeting belongs to the user
+        const existingMeeting = await db
+          .select()
+          .from(meetings)
+          .where(
+            and(
+              eq(meetings.id, input.id),
+              eq(meetings.userId, userId)
+            )
+          )
+          .limit(1);
+
+        if (!existingMeeting.length) {
+          throw new TRPCError({ 
+            code: "NOT_FOUND", 
+            message: "Meeting not found or you don't have permission to update it" 
+          });
+        }
+
+        const [updatedMeeting] = await db
+          .update(meetings)
+          .set({
+            ...input.data,
+            updatedAt: new Date(),
+          })
+          .where(
+            and(
+              eq(meetings.id, input.id),
+              eq(meetings.userId, userId)
+            )
+          )
+          .returning();
+
+        return updatedMeeting;
+      }),
+
+    // Delete a meeting
+    delete: protectedProcedure
+      .input(z.object({ id: z.string() }))
+      .mutation(async ({ input, ctx }) => {
+        const userId = ctx.auth.user.id;
+
+        // First verify the meeting belongs to the user
+        const existingMeeting = await db
+          .select()
+          .from(meetings)
+          .where(
+            and(
+              eq(meetings.id, input.id),
+              eq(meetings.userId, userId)
+            )
+          )
+          .limit(1);
+
+        if (!existingMeeting.length) {
+          throw new TRPCError({ 
+            code: "NOT_FOUND", 
+            message: "Meeting not found or you don't have permission to delete it" 
+          });
+        }
+
+        await db
+          .delete(meetings)
+          .where(
+            and(
+              eq(meetings.id, input.id),
+              eq(meetings.userId, userId)
+            )
+          );
+
+        return { success: true };
+      }),
 });

@@ -46,7 +46,7 @@ export const agentsRouter = createTRPCRouter({
     .input(
       z.object({
         page: z.number().default(1),
-        pageSize: z.number().min(1).max(10).default(10),
+        pageSize: z.number().min(1).max(100).default(10),
         search: z.string().nullish(),
         isActive: z.boolean().nullish(),
         tags: z.string().nullish(),
