@@ -10,9 +10,9 @@ import LoadingState from "@/components/loading-state";
 import { MeetingDetailsView } from "@/components/meetings/meeting-details-view";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default async function MeetingPage({ params }: PageProps) {
@@ -22,12 +22,15 @@ export default async function MeetingPage({ params }: PageProps) {
     redirect("/sign-in");
   }
 
+  // Await params before accessing properties
+  const { id } = await params;
+
   const queryClient = getQueryClient();
 
   try {
     // Prefetch meeting data
     await queryClient.prefetchQuery(
-      trpc.meetings.getOne.queryOptions({ id: params.id })
+      trpc.meetings.getOne.queryOptions({ id })
     );
   } catch (error) {
     // Handle case where meeting doesn't exist
@@ -43,7 +46,7 @@ export default async function MeetingPage({ params }: PageProps) {
     <HydrationBoundary state={dehydrate(queryClient)}>
       <Suspense fallback={<LoadingState title="Loading Meeting" description="Please wait while we load the meeting details" />}>
         <ErrorBoundary fallback={<ErrorState title="Something went wrong" description="Error loading meeting details" />}>
-          <MeetingDetailsView meetingId={params.id} />
+          <MeetingDetailsView meetingId={id} />
         </ErrorBoundary>
       </Suspense>
     </HydrationBoundary>
