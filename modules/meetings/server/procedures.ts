@@ -27,8 +27,7 @@ export const meetingsRouter = createTRPCRouter({
       {
         user_id: ctx.auth.user.id,
         exp: expirationTime,
-        validity_in_seconds: issuedAt,
-
+        iat: issuedAt,
       }
     )
     return token;
