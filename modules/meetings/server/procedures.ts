@@ -122,7 +122,7 @@ export const meetingsRouter = createTRPCRouter({
         data: {
           created_by_id: ctx.auth.user.id,
           custom: {
-            meeetingId: createdMeeting.id,
+            meetingId: createdMeeting.id,
             meetingName: createdMeeting.name,
           },
           settings_override: {
