@@ -26,6 +26,82 @@ export const AskAITab = ({ meeting }: AskAITabProps) => {
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
+    // Function to format AI response content
+    const formatMessageContent = (content: string) => {
+        // Split content into lines and process each line
+        const lines = content.split('\n');
+        const formattedLines = lines.map((line, index) => {
+            // Handle bold text
+            if (line.includes('**')) {
+                const parts = line.split('**');
+                return (
+                    <div key={index} className="mb-3 break-words">
+                        {parts.map((part, partIndex) => 
+                            partIndex % 2 === 1 ? (
+                                <strong key={partIndex} className="font-semibold text-foreground">{part}</strong>
+                            ) : (
+                                <span key={partIndex}>{part}</span>
+                            )
+                        )}
+                    </div>
+                );
+            }
+            
+            // Handle bullet points
+            if (line.trim().startsWith('- ')) {
+                return (
+                    <div key={index} className="ml-4 mb-2 flex items-start">
+                        <span className="text-primary mr-3 mt-0.5 font-bold flex-shrink-0">•</span>
+                        <span className="flex-1 break-words">{line.trim().substring(2)}</span>
+                    </div>
+                );
+            }
+            
+            // Handle numbered lists
+            if (/^\d+\.\s/.test(line.trim())) {
+                return (
+                    <div key={index} className="ml-4 mb-2 flex items-start">
+                        <span className="text-primary mr-3 mt-0.5 font-semibold min-w-[1.5rem] flex-shrink-0">
+                            {line.trim().match(/^\d+/)?.[0]}.
+                        </span>
+                        <span className="flex-1 break-words">{line.trim().replace(/^\d+\.\s/, '')}</span>
+                    </div>
+                );
+            }
+            
+            // Handle timestamps
+            if (line.includes('(') && line.includes(')') && /\d{2}:\d{2}/.test(line)) {
+                return (
+                    <div key={index} className="mb-2 break-words">
+                        {line.split(/(\(\d{2}:\d{2}[^)]*\))/).map((part, partIndex) => 
+                            /\d{2}:\d{2}/.test(part) ? (
+                                <span key={partIndex} className="text-blue-600 font-mono text-xs bg-blue-100 px-2 py-1 rounded-md border inline-block">
+                                    {part}
+                                </span>
+                            ) : (
+                                <span key={partIndex}>{part}</span>
+                            )
+                        )}
+                    </div>
+                );
+            }
+            
+            // Regular text
+            if (line.trim()) {
+                return (
+                    <div key={index} className="mb-2 break-words">
+                        {line}
+                    </div>
+                );
+            }
+            
+            // Empty lines for spacing
+            return <div key={index} className="mb-1"></div>;
+        });
+        
+        return formattedLines;
+    };
+
     const handleSend = async () => {
         if (!input.trim()) return;
 
@@ -37,20 +113,56 @@ export const AskAITab = ({ meeting }: AskAITabProps) => {
         };
 
         setMessages(prev => [...prev, userMessage]);
+        const currentInput = input;
         setInput('');
         setIsLoading(true);
 
-        // TODO: Implement actual AI API call
-        setTimeout(() => {
+        try {
+            console.log('Calling Ask AI API with:', { meetingId: meeting.id, question: currentInput });
+            
+            // Call the Ask AI API
+            const response = await fetch('/api/meetings/ask-ai', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    meetingId: meeting.id,
+                    question: currentInput
+                })
+            });
+
+            console.log('Ask AI Response status:', response.status);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Ask AI Error Response:', errorText);
+                throw new Error(`Failed to get AI response: ${response.status} ${response.statusText} - ${errorText}`);
+            }
+
+            const result = await response.json();
+            console.log('Ask AI Response data:', result);
+            
             const aiMessage: Message = {
                 id: (Date.now() + 1).toString(),
                 role: 'assistant',
-                content: 'This is a placeholder response. AI integration coming soon!',
+                content: result.success ? result.response : `Error: ${result.error || 'Failed to get response'}`,
                 timestamp: new Date(),
             };
+            
             setMessages(prev => [...prev, aiMessage]);
+        } catch (error) {
+            console.error('Error getting AI response:', error);
+            const errorMessage: Message = {
+                id: (Date.now() + 1).toString(),
+                role: 'assistant',
+                content: `Sorry, I encountered an error while processing your question: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`,
+                timestamp: new Date(),
+            };
+            setMessages(prev => [...prev, errorMessage]);
+        } finally {
             setIsLoading(false);
-        }, 1000);
+        }
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -70,7 +182,7 @@ export const AskAITab = ({ meeting }: AskAITabProps) => {
             <Card className="h-[600px] flex flex-col">
                 <CardContent className="flex-1 flex flex-col p-0">
                     {/* Messages Area */}
-                    <ScrollArea className="flex-1 p-6">
+                    <ScrollArea className="flex-1 p-6" style={{ maxHeight: '500px' }}>
                         {messages.length === 0 ? (
                             <div className="h-full flex items-center justify-center">
                                 <div className="text-center max-w-md">
@@ -118,13 +230,19 @@ export const AskAITab = ({ meeting }: AskAITabProps) => {
                                         className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                                     >
                                         <div
-                                            className={`max-w-[80%] rounded-lg px-4 py-3 ${
+                                            className={`max-w-[80%] rounded-lg px-4 py-3 break-words ${
                                                 message.role === 'user'
                                                     ? 'bg-primary text-primary-foreground'
-                                                    : 'bg-muted'
+                                                    : 'bg-muted border'
                                             }`}
                                         >
-                                            <p className="text-sm">{message.content}</p>
+                                            {message.role === 'assistant' ? (
+                                                <div className="text-sm leading-relaxed overflow-hidden">
+                                                    {formatMessageContent(message.content)}
+                                                </div>
+                                            ) : (
+                                                <p className="text-sm break-words">{message.content}</p>
+                                            )}
                                             <p className="text-xs opacity-70 mt-1">
                                                 {message.timestamp.toLocaleTimeString([], { 
                                                     hour: '2-digit', 
